@@ -49,9 +49,10 @@ def remove_comments_and_docstrings(source):
 def download_repo(repo_url, output_file):
     """Download and process files from a GitHub repository."""
     if '/tree/' in repo_url:
-        repo_url = f'https://download-directory.github.io/?{repo_url}'
+        response = requests.get(f'https://download-directory.github.io/?{repo_url}')
+    else:
+        response = requests.get(f"{repo_url}/archive/master.zip")
 
-    response = requests.get(f"{repo_url}/archive/master.zip")
     zip_file = zipfile.ZipFile(io.BytesIO(response.content))
 
     with open(output_file, "w", encoding="utf-8") as outfile:
@@ -75,7 +76,6 @@ def download_repo(repo_url, output_file):
             outfile.write(f"# File: {file_path}\n")
             outfile.write(file_content)
             outfile.write("\n\n")
-
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: python script.py <github_repo_url>")
